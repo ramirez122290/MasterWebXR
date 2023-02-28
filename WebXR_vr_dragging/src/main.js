@@ -1,272 +1,261 @@
-import * as THREE from "https://cdn.skypack.dev/three@0.132.2";
+import * as THREE from 'three';
 
-//import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
 
-import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-import { VRButton } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/webxr/VRButton.js';
+let container;
+let camera, scene, renderer;
+let controller1, controller2;
+let controllerGrip1, controllerGrip2;
 
-//from 'three/addons/webxr/VRButton.js';
+let raycaster;
 
-import { XRControllerModelFactory } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/webxr/XRControllerModelFactory.js';
+const intersected = [];
+const tempMatrix = new THREE.Matrix4();
 
-//from 'three/addons/webxr/XRControllerModelFactory.js';
+let group;
 
-			let container;
-			let camera, scene, renderer;
-			let controller1, controller2;
-			let controllerGrip1, controllerGrip2;
+init();
+animate();
 
-			let raycaster;
+function init() {
 
-			const intersected = [];
-			const tempMatrix = new THREE.Matrix4();
+    container = document.createElement( 'div' );
+    document.body.appendChild( container );
 
-			let controls, group;
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0x808080 );
 
-			init();
-			animate();
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+    camera.position.set( 0, 1.6, 3 );
 
-			function init() {
+    const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
+    const floorMaterial = new THREE.MeshStandardMaterial( {
+            color: 0xeeeeee,
+            roughness: 1.0,
+            metalness: 0.0
+    } );
+    const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+    floor.rotation.x = - Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add( floor );
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+    scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x808081 );
+    const light = new THREE.DirectionalLight( 0xffffff );
+    light.position.set( 0, 6, 0 );
+    light.castShadow = true;
+    light.shadow.camera.top = 2;
+    light.shadow.camera.bottom = - 2;
+    light.shadow.camera.right = 2;
+    light.shadow.camera.left = - 2;
+    light.shadow.mapSize.set( 4096, 4096 );
+    scene.add( light );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.11, 10 );
-				camera.position.set( 0, 1.6, 3 );
+    group = new THREE.Group();
+    scene.add( group );
 
-				controls = new OrbitControls( camera, container );
-				controls.target.set( 0, 1.6, 0 );
-				controls.update();
+    const geometries = [
+            new THREE.BoxGeometry( 0.2, 0.2, 0.2 ),
+            new THREE.ConeGeometry( 0.2, 0.2, 64 ),
+            new THREE.CylinderGeometry( 0.2, 0.2, 0.2, 64 ),
+            new THREE.IcosahedronGeometry( 0.2, 8 ),
+            new THREE.TorusGeometry( 0.2, 0.04, 64, 32 )
+    ];
 
-				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
-				const floorMaterial = new THREE.MeshStandardMaterial( {
-					color: 0xeeeeee,
-					roughness: 1.0,
-					metalness: 0.0
-				} );
-				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
-				floor.rotation.x = - Math.PI / 2;
-				floor.receiveShadow = true;
-				scene.add( floor );
+    for ( let i = 0; i < 50; i ++ ) {
 
-				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+            const geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
+            const material = new THREE.MeshStandardMaterial( {
+                    color: Math.random() * 0xffffff,
+                    roughness: 0.7,
+                    metalness: 0.0
+            } );
 
-				const light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 6, 0 );
-				light.castShadow = true;
-				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = - 2;
-				light.shadow.camera.right = 2;
-				light.shadow.camera.left = - 2;
-				light.shadow.mapSize.set( 4096, 4096 );
-				scene.add( light );
+            const object = new THREE.Mesh( geometry, material );
 
-				group = new THREE.Group();
-				scene.add( group );
+            object.position.x = Math.random() * 4 - 2;
+            object.position.y = Math.random() * 2;
+            object.position.z = Math.random() * 4 - 2;
 
-				const geometries = [
-					new THREE.BoxGeometry( 0.2, 0.2, 0.2 ),
-					new THREE.ConeGeometry( 0.2, 0.2, 64 ),
-					new THREE.CylinderGeometry( 0.2, 0.2, 0.2, 64 ),
-					new THREE.IcosahedronGeometry( 0.2, 8 ),
-					new THREE.TorusGeometry( 0.2, 0.04, 64, 32 )
-				];
+            object.rotation.x = Math.random() * 2 * Math.PI;
+            object.rotation.y = Math.random() * 2 * Math.PI;
+            object.rotation.z = Math.random() * 2 * Math.PI;
 
-				for ( let i = 0; i < 50; i ++ ) {
+            object.scale.setScalar( Math.random() + 0.5 );
 
-					const geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
-					const material = new THREE.MeshStandardMaterial( {
-						color: Math.random() * 0xffffff,
-						roughness: 0.7,
-						metalness: 0.0
-					} );
+            object.castShadow = true;
+            object.receiveShadow = true;
 
-					const object = new THREE.Mesh( geometry, material );
+            group.add( object );
 
-					object.position.x = Math.random() * 4 - 2;
-					object.position.y = Math.random() * 2;
-					object.position.z = Math.random() * 4 - 2;
+    }
 
-					object.rotation.x = Math.random() * 2 * Math.PI;
-					object.rotation.y = Math.random() * 2 * Math.PI;
-					object.rotation.z = Math.random() * 2 * Math.PI;
+    //
 
-					object.scale.setScalar( Math.random() + 0.5 );
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.xr.enabled = true;
+    container.appendChild( renderer.domElement );
 
-					object.castShadow = true;
-					object.receiveShadow = true;
+    document.body.appendChild( VRButton.createButton( renderer ) );
 
-					group.add( object );
+    // controllers
 
-				}
+    controller1 = renderer.xr.getController( 0 );
+    controller1.addEventListener( 'selectstart', onSelectStart );
+    controller1.addEventListener( 'selectend', onSelectEnd );
+    scene.add( controller1 );
 
-				//
+    controller2 = renderer.xr.getController( 1 );
+    controller2.addEventListener( 'selectstart', onSelectStart );
+    controller2.addEventListener( 'selectend', onSelectEnd );
+    scene.add( controller2 );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.shadowMap.enabled = true;
-				renderer.xr.enabled = true;
-				container.appendChild( renderer.domElement );
+    const controllerModelFactory = new XRControllerModelFactory();
 
-				document.body.appendChild( VRButton.createButton( renderer ) );
+    controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+    controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+    scene.add( controllerGrip1 );
 
-				// controllers
+    controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+    controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+    scene.add( controllerGrip2 );
 
-				controller1 = renderer.xr.getController( 0 );
-				controller1.addEventListener( 'selectstart', onSelectStart );
-				controller1.addEventListener( 'selectend', onSelectEnd );
-				scene.add( controller1 );
+    //
 
-				controller2 = renderer.xr.getController( 1 );
-				controller2.addEventListener( 'selectstart', onSelectStart );
-				controller2.addEventListener( 'selectend', onSelectEnd );
-				scene.add( controller2 );
+    const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
-				const controllerModelFactory = new XRControllerModelFactory();
+    const line = new THREE.Line( geometry );
+    line.name = 'line';
+    line.scale.z = 5;
 
-				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-				scene.add( controllerGrip1 );
+    controller1.add( line.clone() );
+    controller2.add( line.clone() );
 
-				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
-				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
-				scene.add( controllerGrip2 );
+    raycaster = new THREE.Raycaster();
 
-				//
+    //
 
-				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+    window.addEventListener( 'resize', onWindowResize );
 
-				const line = new THREE.Line( geometry );
-				line.name = 'line';
-				line.scale.z = 5;
+}
 
-				controller1.add( line.clone() );
-				controller2.add( line.clone() );
+function onWindowResize() {
 
-				raycaster = new THREE.Raycaster();
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
-				//
+    renderer.setSize( window.innerWidth, window.innerHeight );
 
-				window.addEventListener( 'resize', onWindowResize );
+}
 
-			}
+function onSelectStart( event ) {
 
-			function onWindowResize() {
+    const controller = event.target;
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+    const intersections = getIntersections( controller );
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+    if ( intersections.length > 0 ) {
 
-			}
+            const intersection = intersections[ 0 ];
 
-			function onSelectStart( event ) {
+            const object = intersection.object;
+            object.material.emissive.b = 1;
+            controller.attach( object );
 
-				const controller = event.target;
+            controller.userData.selected = object;
 
-				const intersections = getIntersections( controller );
+    }
 
-				if ( intersections.length > 0 ) {
+}
 
-					const intersection = intersections[ 0 ];
+function onSelectEnd( event ) {
 
-					const object = intersection.object;
-					object.material.emissive.b = 1;
-					controller.attach( object );
+    const controller = event.target;
 
-					controller.userData.selected = object;
+    if ( controller.userData.selected !== undefined ) {
 
-				}
+            const object = controller.userData.selected;
+            object.material.emissive.b = 0;
+            group.attach( object );
 
-			}
+            controller.userData.selected = undefined;
 
-			function onSelectEnd( event ) {
+    }
 
-				const controller = event.target;
 
-				if ( controller.userData.selected !== undefined ) {
+}
 
-					const object = controller.userData.selected;
-					object.material.emissive.b = 0;
-                                         group.attach( object );
+function getIntersections( controller ) {
 
-					controller.userData.selected = undefined;
+    tempMatrix.identity().extractRotation( controller.matrixWorld );
 
-				}
+    raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+    raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
+    return raycaster.intersectObjects( group.children, false );
 
-			}
+}
 
-			function getIntersections( controller ) {
+function intersectObjects( controller ) {
 
-				tempMatrix.identity().extractRotation( controller.matrixWorld );
+    // Do not highlight when already selected
 
-				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+    if ( controller.userData.selected !== undefined ) return;
 
-				return raycaster.intersectObjects( group.children, false );
+    const line = controller.getObjectByName( 'line' );
+    const intersections = getIntersections( controller );
 
-			}
+    if ( intersections.length > 0 ) {
 
-			function intersectObjects( controller ) {
+            const intersection = intersections[ 0 ];
 
-				// Do not highlight when already selected
+            const object = intersection.object;
+            object.material.emissive.r = 1;
+            intersected.push( object );
 
-				if ( controller.userData.selected !== undefined ) return;
+            line.scale.z = intersection.distance;
 
-				const line = controller.getObjectByName( 'line' );
-				const intersections = getIntersections( controller );
+    } else {
 
-				if ( intersections.length > 0 ) {
+            line.scale.z = 5;
 
-					const intersection = intersections[ 0 ];
+    }
 
-					const object = intersection.object;
-					object.material.emissive.r = 1;
-					intersected.push( object );
+}
 
-					line.scale.z = intersection.distance;
+function cleanIntersected() {
 
-				} else {
+    while ( intersected.length ) {
 
-					line.scale.z = 5;
+            const object = intersected.pop();
+            object.material.emissive.r = 0;
 
-				}
+    }
 
-			}
+}
 
-			function cleanIntersected() {
+//
 
-				while ( intersected.length ) {
+function animate() {
 
-					const object = intersected.pop();
-					object.material.emissive.r = 0;
+    renderer.setAnimationLoop( render );
 
-				}
+}
 
-			}
+function render() {
 
-			//
+    cleanIntersected();
 
-			function animate() {
+    intersectObjects( controller1 );
+    intersectObjects( controller2 );
 
-				renderer.setAnimationLoop( render );
+    renderer.render( scene, camera );
 
-			}
+}
 
-			function render() {
-
-				cleanIntersected();
-
-				intersectObjects( controller1 );
-				intersectObjects( controller2 );
-
-				renderer.render( scene, camera );
-
-			}
