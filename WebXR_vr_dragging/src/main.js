@@ -33,9 +33,9 @@ import { XRControllerModelFactory } from 'https://cdn.skypack.dev/three@0.132.2/
 				document.body.appendChild( container );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x808080 );
+				scene.background = new THREE.Color( 0x808081 );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.11, 10 );
 				camera.position.set( 0, 1.6, 3 );
 
 				controls = new OrbitControls( camera, container );
