@@ -87,7 +87,7 @@ function init() {
 
 }
 
-renderer.xr.addEventListener(‘sessionstart’, () => {
+renderer.xr.addEventListener('sessionstart', () => {
 
 renderer.xr.getCamera().position.copy( camera.position);
 
