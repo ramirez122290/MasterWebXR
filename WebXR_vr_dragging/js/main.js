@@ -73,7 +73,7 @@ function init() {
     controller2 = renderer.xr.getController( 1 );
     controller2.addEventListener( 'selectstart', onSelectStart );
     controller2.addEventListener( 'selectend', onSelectEnd );
-    scene.add( controller1 );
+    scene.add( controller2 );
 
     controllerGrip2 = renderer.xr.getControllerGrip( 1 );
     controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
