@@ -29,6 +29,9 @@ animate();
 
 function init() {
 
+    container = document.createElement( 'div' );
+    document.body.appendChild( container );
+         
     raycaster = new THREE.Raycaster();
 
     scene = new THREE.Scene();
