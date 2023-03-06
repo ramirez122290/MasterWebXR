@@ -85,7 +85,7 @@ function init() {
 
     const line = new THREE.Line( geometry );
     line.name = 'line';
-    line.scale.z = 5;
+    line.scale.z = 75;
 
     controller1.add( line.clone() );
     controller2.add( line.clone() );
