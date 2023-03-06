@@ -13,6 +13,7 @@ let skinnedMesh, skeleton, bones, skeletonHelper;
 let box0, box1, box2, box3, box4;
 let boxes = [];
 const intersected = [];
+const tempMatrix = new THREE.Matrix4();
 
 let raycaster, selected;
 
@@ -86,7 +87,7 @@ function init() {
 
     const line = new THREE.Line( geometry );
     line.name = 'line';
-    line.scale.z = 75;
+    line.scale.z = 5;
 
     controller1.add( line.clone() );
     controller2.add( line.clone() );
