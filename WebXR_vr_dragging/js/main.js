@@ -84,11 +84,16 @@ function init() {
     window.addEventListener( 'mousemove', onPointerMove );
     window.addEventListener( 'pointerdown', onPointerDown );
     window.addEventListener( 'pointerup', onPointerUp );
-         
+
+}
+
+renderer.xr.addEventListener(‘sessionstart’, () => {
+
 renderer.xr.getCamera().position.copy( camera.position);
 
-//renderer.xr.getCamera().lookAt( camera.target );
-}
+renderer.xr.getCamera().lookAt( camera.target );
+
+});
 
 function onPointerDown( event ) {
 
