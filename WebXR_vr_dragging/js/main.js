@@ -87,7 +87,7 @@ function init() {
          
 renderer.xr.getCamera().position.copy( camera.position);
 
-renderer.xr.getCamera().lookAt( camera.target );
+//renderer.xr.getCamera().lookAt( camera.target );
 }
 
 function onPointerDown( event ) {
