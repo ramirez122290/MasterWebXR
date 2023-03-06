@@ -265,6 +265,10 @@ function initSkinnedMesh() {
     // aprovecho para fijar la x y la z de todas las cajas a las del hueso 0. En cambio,
     // para la y, multiplico el tamaó del segmento por el numero de caja (que sería equivalente a la suma acumulada)
     box0 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
+         
+    skeleton.bones[0].position.x = 400;
+    skeleton.bones[0].position.z = 400;
+         
     box0.position.x = skeleton.bones[0].position.x;
     box0.position.y = skeleton.bones[0].position.y;
     box0.position.z = skeleton.bones[0].position.z;
