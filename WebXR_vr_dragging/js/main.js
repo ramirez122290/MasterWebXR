@@ -372,9 +372,9 @@ function getIntersections( controller ) {
 }
 
 function animate() {
-
-    requestAnimationFrame( animate );
-    
+         
+    renderer.setAnimationLoop( render );
+         
     distAcX = skeleton.bones[0].position.x;
     distAcY = skeleton.bones[0].position.y;
 
