@@ -2,6 +2,9 @@ import {VRButton} from 'three/addons/webxr/VRButton.js';
 import {XRControllerModelFactory} from 'three/addons/webxr/XRControllerModelFactory.js';
 import * as THREE from 'three';
 
+let controller1, controller2;
+let controllerGrip1, controllerGrip2;
+
 let camera, scene, renderer;
 
 let skinnedMesh, skeleton, bones, skeletonHelper;
