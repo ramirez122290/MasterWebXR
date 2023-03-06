@@ -375,6 +375,12 @@ function animate() {
          
     renderer.setAnimationLoop( render );
          
+
+
+}
+
+function render() {
+         
     distAcX = skeleton.bones[0].position.x;
     distAcY = skeleton.bones[0].position.y;
 
@@ -384,7 +390,6 @@ function animate() {
     }
 
     renderer.render( scene, camera );
-
 }
 
 function actualizar(caja) {
