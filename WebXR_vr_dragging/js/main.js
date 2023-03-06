@@ -12,6 +12,7 @@ let skinnedMesh, skeleton, bones, skeletonHelper;
 
 let box0, box1, box2, box3, box4;
 let boxes = [];
+const intersected = [];
 
 let raycaster, selected;
 
