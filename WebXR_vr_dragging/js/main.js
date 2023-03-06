@@ -14,6 +14,7 @@ let box0, box1, box2, box3, box4;
 let boxes = [];
 const intersected = [];
 const tempMatrix = new THREE.Matrix4();
+let group;
 
 let raycaster, selected;
 
@@ -46,6 +47,9 @@ function init() {
     
     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
     camera.position.z = 400;
+         
+    group = new THREE.Group();
+    scene.add( group );
     
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
