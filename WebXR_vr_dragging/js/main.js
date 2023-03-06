@@ -87,13 +87,13 @@ function init() {
 
 }
 
-renderer.xr.addEventListener('sessionstart', () => {
+//renderer.xr.addEventListener('sessionstart', () => {
 
-renderer.xr.getCamera().position.copy( camera.position);
+//renderer.xr.getCamera().position.copy( camera.position);
 
-renderer.xr.getCamera().lookAt( camera.target );
+//renderer.xr.getCamera().lookAt( camera.target );
 
-});
+//});
 
 function onPointerDown( event ) {
 
