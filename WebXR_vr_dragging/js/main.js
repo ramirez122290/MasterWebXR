@@ -31,16 +31,6 @@ function init() {
     raycaster = new THREE.Raycaster();
 
     scene = new THREE.Scene();
-    
-    controller1 = renderer.xr.getController( 0 );
-    controller1.addEventListener( 'selectstart', onSelectStart );
-    controller1.addEventListener( 'selectend', onSelectEnd );
-    scene.add( controller1 );
-    
-    const controllerModelFactory = new XRControllerModelFactory();
-    controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-    controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-    scene.add( controllerGrip1 );
 
     let dirLight = new THREE.DirectionalLight ( 0xffffff, 0.5 );
     scene.add( dirLight );
@@ -60,6 +50,25 @@ function init() {
     
     //new OrbitControls( camera, renderer.domElement );
     
+    controller1 = renderer.xr.getController( 0 );
+    controller1.addEventListener( 'selectstart', onSelectStart );
+    controller1.addEventListener( 'selectend', onSelectEnd );
+    scene.add( controller1 );
+    
+    const controllerModelFactory = new XRControllerModelFactory();
+    controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+    controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+    scene.add( controllerGrip1 );
+         
+    controller2 = renderer.xr.getController( 1 );
+    controller2.addEventListener( 'selectstart', onSelectStart );
+    controller2.addEventListener( 'selectend', onSelectEnd );
+    scene.add( controller1 );
+
+    controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+    controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+    scene.add( controllerGrip2 );
+         
     initSkinnedMesh();
 
     window.addEventListener( 'mousemove', onPointerMove );
