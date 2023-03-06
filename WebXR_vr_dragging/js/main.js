@@ -43,7 +43,7 @@ function init() {
     scene.add( hemiLight );
     
     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-    camera.position.z = 60;
+    camera.position.z = 400;
     
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
