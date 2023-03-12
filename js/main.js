@@ -46,7 +46,7 @@ function init() {
     scene.add( hemiLight );
     
     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-    camera.position.z = 400;
+    camera.position.z = 60;
          
     group = new THREE.Group();
     scene.add( group );
@@ -286,13 +286,13 @@ function initSkinnedMesh() {
     // para la y, multiplico el tamaó del segmento por el numero de caja (que sería equivalente a la suma acumulada)
     box0 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
          
-    skeleton.bones[0].position.z = 50;
+    skeleton.bones[0].position.z = -30;
          
     box0.position.x = skeleton.bones[0].position.x;
     box0.position.y = skeleton.bones[0].position.y;
     box0.position.z = skeleton.bones[0].position.z;
     box0.art = skeleton.bones[0];
-    scene.add(box0);
+    group.add(box0);
     boxes.push(box0);
     
     box1 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
@@ -300,7 +300,7 @@ function initSkinnedMesh() {
     box1.position.y = skeleton.bones[0].position.y + sizing.segmentHeight;
     box1.position.z = skeleton.bones[0].position.z;
     box1.art = skeleton.bones[1];
-    scene.add(box1);
+    group.add(box1);
     boxes.push(box1);
     
     box2 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
@@ -308,7 +308,7 @@ function initSkinnedMesh() {
     box2.position.y = skeleton.bones[0].position.y + sizing.segmentHeight*2;
     box2.position.z = skeleton.bones[0].position.z;
     box2.art = skeleton.bones[2];
-    scene.add(box2);
+    group.add(box2);
     boxes.push(box2);
     
     box3 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
@@ -316,7 +316,7 @@ function initSkinnedMesh() {
     box3.position.y = skeleton.bones[0].position.y + sizing.segmentHeight*3;
     box3.position.z = skeleton.bones[0].position.z;
     box3.art = skeleton.bones[3];
-    scene.add(box3);
+    group.add(box3);
     boxes.push(box3);
     
     box4 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
@@ -324,7 +324,7 @@ function initSkinnedMesh() {
     box4.position.y = skeleton.bones[0].position.y + sizing.segmentHeight*4;
     box4.position.z = skeleton.bones[0].position.z;
     box4.art = skeleton.bones[4];
-    scene.add(box4);
+    group.add(box4);
     boxes.push(box4);
 }
 
