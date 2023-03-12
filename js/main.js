@@ -23,7 +23,9 @@ let notSelectedC=0x001000;
 
 let alturaS = 6;
 
-let distAcX, distAcY;
+let distAcX, distAcY, distAcZ;
+
+let flag = 0
 
 const pointer = new THREE.Vector2();
          
@@ -69,11 +71,13 @@ function init() {
     controller1 = renderer.xr.getController( 0 );
     controller1.addEventListener( 'selectstart', onSelectStart );
     controller1.addEventListener( 'selectend', onSelectEnd );
+    controller1.addEventListener( 'move', onMove);
     scene.add( controller1 );
 
     controller2 = renderer.xr.getController( 1 );
     controller2.addEventListener( 'selectstart', onSelectStart );
     controller2.addEventListener( 'selectend', onSelectEnd );
+    controller2.addEventListener( 'move', onMove);
     scene.add( controller2 );
 
     const controllerModelFactory = new XRControllerModelFactory();
@@ -101,9 +105,9 @@ function init() {
          
     initSkinnedMesh();
 
-    window.addEventListener( 'mousemove', onPointerMove );
-    window.addEventListener( 'pointerdown', onPointerDown );
-    window.addEventListener( 'pointerup', onPointerUp );
+    //window.addEventListener( 'mousemove', onPointerMove );
+    //window.addEventListener( 'pointerdown', onPointerDown );
+    //window.addEventListener( 'pointerup', onPointerUp );
 
 }
 
@@ -165,6 +169,11 @@ function onSelectStart( event ) {
 
             controller.userData.selected = object;
 
+            controller.userData.selected.desfX = damePosicionCaja(object).x - object.position.x;
+            controller.userData.selected.desfY = damePosicionCaja(object).y - object.position.y;
+            controller.userData.selected.desfZ = damePosicionCaja(object).z - object.position.z;
+
+
     }
 
 }
@@ -191,6 +200,46 @@ function onPointerUp( event ) {
         selected.currentDrag = false;
         selected.material.emissive.setHex(notSelectedC);
     }
+}
+
+function damePosicionCaja(box) {
+    var v = new THREE.Vector3();
+    v.copy(box.position);
+    box.localToWorld(v);
+    return v;
+}
+
+function onMove (event) {
+
+    const controller = event.target;
+    if (controller.userData.selected !== undefined) {
+        let seleccionada = controller.userData.selected;
+
+        /*console.log(damePosicionCaja(seleccionada))
+
+        console.log(seleccionada.desfX)
+        console.log(seleccionada.desfY)
+        console.log(seleccionada.desfZ)
+
+
+        console.log(damePosicionCaja(seleccionada).x - seleccionada.desfX)
+        console.log(damePosicionCaja(seleccionada).y - seleccionada.desfY)
+        console.log(damePosicionCaja(seleccionada).z - seleccionada.desfZ)
+
+        console.log("          ")*/
+        
+        actualizarHuesoSeleccionada(seleccionada)
+        
+    }
+
+
+    /*distAcX = 0;
+    distAcY = 0;
+    distAcZ = 0
+
+    for (var i = 0; i < boxes.length; i++) {
+        actualizar(boxes[i]); 
+    }*/
 }
 
 function onPointerMove( event ) {
@@ -292,6 +341,7 @@ function initSkinnedMesh() {
     box0.position.y = skeleton.bones[0].position.y;
     box0.position.z = skeleton.bones[0].position.z;
     box0.art = skeleton.bones[0];
+    box0.artIdx = 0;
     group.add(box0);
     boxes.push(box0);
     
@@ -300,6 +350,7 @@ function initSkinnedMesh() {
     box1.position.y = skeleton.bones[0].position.y + sizing.segmentHeight;
     box1.position.z = skeleton.bones[0].position.z;
     box1.art = skeleton.bones[1];
+    box1.artIdx = 1;
     group.add(box1);
     boxes.push(box1);
     
@@ -308,6 +359,7 @@ function initSkinnedMesh() {
     box2.position.y = skeleton.bones[0].position.y + sizing.segmentHeight*2;
     box2.position.z = skeleton.bones[0].position.z;
     box2.art = skeleton.bones[2];
+    box2.artIdx = 2;
     group.add(box2);
     boxes.push(box2);
     
@@ -316,6 +368,7 @@ function initSkinnedMesh() {
     box3.position.y = skeleton.bones[0].position.y + sizing.segmentHeight*3;
     box3.position.z = skeleton.bones[0].position.z;
     box3.art = skeleton.bones[3];
+    box3.artIdx = 3;
     group.add(box3);
     boxes.push(box3);
     
@@ -324,6 +377,7 @@ function initSkinnedMesh() {
     box4.position.y = skeleton.bones[0].position.y + sizing.segmentHeight*4;
     box4.position.z = skeleton.bones[0].position.z;
     box4.art = skeleton.bones[4];
+    box4.artIdx = 4;
     group.add(box4);
     boxes.push(box4);
 }
@@ -418,13 +472,13 @@ function intersectObjects( controller ) {
 
             const object = intersection.object;
             object.material.emissive.r = 1;
-            intersected.push( object );
+            //intersected.push( object );
 
             line.scale.z = intersection.distance;
 
     } else {
 
-            line.scale.z = 5;
+            line.scale.z = 100;
 
     }
 
@@ -442,36 +496,37 @@ function cleanIntersected() {
 }
 
 function animate() {
-         
     renderer.setAnimationLoop( render );
-         
-
-
 }
 
 function render() {
-    cleanIntersected();
+    //cleanIntersected();
+
     intersectObjects( controller1 );
     intersectObjects( controller2 );
-         
-    distAcX = skeleton.bones[0].position.x;
-    distAcY = skeleton.bones[0].position.y;
-
-    for (var i = 1; i < boxes.length; i++) {
-                    
-        actualizar(boxes[i]); 
-    }
 
     renderer.render( scene, camera );
 }
 
-function actualizar(caja) {
-    if (!isNaN(distAcX)){
-         
-        distAcX += caja.art.position.x;
-        distAcY += caja.art.position.y;
+function actualizarHuesoSeleccionada(caja) {
+    let relativa = damePosicionCaja(caja);
 
-        caja.position.x = distAcX;
-        caja.position.y = distAcY;
+    console.log(relativa)
+
+    let x = 0, y = 0, z = 0;
+
+    for (let i = 0; i < caja.artIdx; i++) {
+        x += boxes[i].position.x;
+        y += boxes[i].position.y;
+        z += boxes[i].position.z;
     }
+
+    caja.art.position.setFromMatrixPosition( caja.matrixWorld );
+
+    /*Enviar mensaje a @Eduardo98M
+    
+    caja.art.position.x = relativa.x - caja.desfX + x;
+    caja.art.position.y = relativa.y - caja.desfX + y;
+    caja.art.position.z = relativa.z - caja.desfX + z;*/
+
 }
