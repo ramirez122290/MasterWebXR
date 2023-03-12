@@ -100,12 +100,27 @@ function onSelectStart( event ) {
     const intersections = getIntersections( controller );
     if ( intersections.length > 0 ) {
 
-            const intersection = intersections[ 0 ];
-            const object = intersection.object;
-            object.material.emissive.b = 1;
-            controller.attach( object );
-            controller.userData.selected = object;
+        boxes.forEach(box => {
+            let posicion = damePosicionGlobal(box.art);
 
+            box.ox = posicion.x;
+            box.oy = posicion.y;
+            box.oz = posicion.z;
+        });
+
+        const intersection = intersections[ 0 ];
+        const object = intersection.object;
+        object.material.emissive.b = 1;
+        controller.attach( object );
+        controller.userData.selected = object;
+
+        boxes.forEach(box => {
+            let posicion = damePosicionGlobal(object.art);
+
+            box.ox -= posicion.x;
+            box.oy -= posicion.y - 6*(object.artIdx - box.artIdx);
+            box.oz -= posicion.z;
+        });
     }
 }
 
@@ -361,6 +376,7 @@ function render() {
 }
 
 function actualizarHuesoSeleccionada(caja) {
+
     let relativa = damePosicionGlobal(caja);
 
     if (caja.boxAnt !== undefined) {
@@ -380,6 +396,40 @@ function actualizarHuesoSeleccionada(caja) {
             relativa.z
         )
     }
+
+    /*let posX=0, posY=0, posZ=0;
+
+    if (caja !== box0) {
+        for (var i = 0; i < boxes.length; i++) {
+
+            if (caja === boxes[i]){
+                break;
+            }
+            
+            let aux = damePosicionGlobal(boxes[i].art)
+
+            posX += aux.x;
+            posY += aux.y;
+            posZ += aux.z;
+        }
+    }*/
+
+    if (caja !== box0) {
+        let cajaActual = caja.boxSig;
+
+        while (cajaActual !== undefined) {
+            
+            let posGlobal = damePosicionGlobal(caja.art)
+
+
+            cajaActual.art.position.x = cajaActual.ox + caja.art.position.x //- posX;
+            cajaActual.art.position.y = cajaActual.oy + caja.art.position.y //- posY;
+            cajaActual.art.position.z = cajaActual.oz + caja.art.position.z //- posZ;
+
+            cajaActual = cajaActual.boxSig;
+        }
+    }
+
 }
 
 function actualizarRestoCajas(caja) {
@@ -395,5 +445,5 @@ function actualizarRestoCajas(caja) {
             relativa.z
         )
         cajaActual = cajaActual.boxSig;
-      }
+    }
 }
