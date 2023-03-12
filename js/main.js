@@ -16,18 +16,7 @@ const intersected = [];
 const tempMatrix = new THREE.Matrix4();
 let group;
 
-let raycaster, selected;
-
-let selectedC=0xff0000;
-let notSelectedC=0x001000;
-
-let alturaS = 6;
-
-let distAcX, distAcY, distAcZ;
-
-let flag = 0
-
-const pointer = new THREE.Vector2();
+let raycaster;
          
 init();
 animate();
@@ -66,8 +55,6 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize );
     
-    //new OrbitControls( camera, renderer.domElement );
-    
     controller1 = renderer.xr.getController( 0 );
     controller1.addEventListener( 'selectstart', onSelectStart );
     controller1.addEventListener( 'selectend', onSelectEnd );
@@ -104,53 +91,6 @@ function init() {
          
          
     initSkinnedMesh();
-
-    //window.addEventListener( 'mousemove', onPointerMove );
-    //window.addEventListener( 'pointerdown', onPointerDown );
-    //window.addEventListener( 'pointerup', onPointerUp );
-
-}
-
-//renderer.xr.addEventListener('sessionstart', () => {
-
-//renderer.xr.getCamera().position.copy( camera.position);
-
-//renderer.xr.getCamera().lookAt( camera.target );
-
-//});
-
-function onPointerDown( event ) {
-
-    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    raycaster.setFromCamera(pointer, camera);
-    
-    const found = raycaster.intersectObjects(scene.children, true);
-    
-    if (found.length) {   
-        let obj = found[0].object;
-        
-        // Para que no se pueda seleccionar la malla
-        if (obj !== skinnedMesh) {
-           
-            boxes.forEach(box => {
-                box.ox = box.art.position.x;
-                box.oy = box.art.position.y;
-            });
-
-
-            obj.material.emissive.setHex(selectedC);
-            obj.currentDrag = true;
-            obj.desfX = obj.position.x - found[0].point.x;
-            obj.desfY = obj.position.y - found[0].point.y;
-            selected = obj;
-
-            boxes.forEach(box => {
-                box.ox -= selected.art.position.x;
-                box.oy -= selected.art.position.y;
-            });
-        }
-    }
 }
 
 function onSelectStart( event ) {
@@ -158,24 +98,15 @@ function onSelectStart( event ) {
     const controller = event.target;
 
     const intersections = getIntersections( controller );
-
     if ( intersections.length > 0 ) {
 
             const intersection = intersections[ 0 ];
-
             const object = intersection.object;
             object.material.emissive.b = 1;
             controller.attach( object );
-
             controller.userData.selected = object;
 
-            controller.userData.selected.desfX = damePosicionCaja(object).x - object.position.x;
-            controller.userData.selected.desfY = damePosicionCaja(object).y - object.position.y;
-            controller.userData.selected.desfZ = damePosicionCaja(object).z - object.position.z;
-
-
     }
-
 }
 
 function onSelectEnd( event ) {
@@ -189,23 +120,13 @@ function onSelectEnd( event ) {
             group.attach( object );
 
             controller.userData.selected = undefined;
-
-    }
-
-
-}
-
-function onPointerUp( event ) {
-    if (selected !== undefined){
-        selected.currentDrag = false;
-        selected.material.emissive.setHex(notSelectedC);
     }
 }
 
-function damePosicionCaja(box) {
+function damePosicionGlobal(box) {
     var v = new THREE.Vector3();
     v.copy(box.position);
-    box.localToWorld(v);
+    box.getWorldPosition(v);
     return v;
 }
 
@@ -214,77 +135,9 @@ function onMove (event) {
     const controller = event.target;
     if (controller.userData.selected !== undefined) {
         let seleccionada = controller.userData.selected;
-
-        /*console.log(damePosicionCaja(seleccionada))
-
-        console.log(seleccionada.desfX)
-        console.log(seleccionada.desfY)
-        console.log(seleccionada.desfZ)
-
-
-        console.log(damePosicionCaja(seleccionada).x - seleccionada.desfX)
-        console.log(damePosicionCaja(seleccionada).y - seleccionada.desfY)
-        console.log(damePosicionCaja(seleccionada).z - seleccionada.desfZ)
-
-        console.log("          ")*/
         
         actualizarHuesoSeleccionada(seleccionada)
-        
-    }
-
-
-    /*distAcX = 0;
-    distAcY = 0;
-    distAcZ = 0
-
-    for (var i = 0; i < boxes.length; i++) {
-        actualizar(boxes[i]); 
-    }*/
-}
-
-function onPointerMove( event ) {
-    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    raycaster.setFromCamera(pointer, camera);
-    const found = raycaster.intersectObjects(scene.children, true);
-    if (found.length) {  
-        if (selected && selected.currentDrag === true) {
-            selected.position.x =  found[0].point.x + selected.desfX;
-            selected.position.y = found[0].point.y + selected.desfY;
-            
-            var posx = 0;
-            var posy = 0;
-            
-            if (selected !== box0) {
-                for (var i = 0; i < boxes.length; i++) {
-                    
-                    if (selected === boxes[i]){
-                        break;
-                    }
-                    posx += boxes[i].art.position.x;
-                    posy += boxes[i].art.position.y;
-                }
-            }
-            
-            selected.art.position.x = (found[0].point.x + selected.desfX) - posx;
-            selected.art.position.y = (found[0].point.y + selected.desfY) - posy;
-            
-            let encontrado = false;
-            
-            if (selected !== box0) {
-                boxes.forEach(box => {
-                    
-                    if(encontrado) {
-                        box.art.position.x = box.ox + selected.art.position.x;
-                        box.art.position.y = box.oy + selected.art.position.y;
-                    }
-                    
-                    if (selected === box){
-                        encontrado = true;
-                    }
-                });
-            }
-        }
+        actualizarRestoCajas(seleccionada)
     }
 }
 
@@ -329,10 +182,7 @@ function initSkinnedMesh() {
 
 
     const aBoxGeometry = new THREE.BoxGeometry( 10, 2, 10 );
-    
-    // Aquí hago un poco de "trampa". Como se que están todos los huesos alineados,
-    // aprovecho para fijar la x y la z de todas las cajas a las del hueso 0. En cambio,
-    // para la y, multiplico el tamaó del segmento por el numero de caja (que sería equivalente a la suma acumulada)
+
     box0 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
          
     skeleton.bones[0].position.z = -30;
@@ -351,6 +201,7 @@ function initSkinnedMesh() {
     box1.position.z = skeleton.bones[0].position.z;
     box1.art = skeleton.bones[1];
     box1.artIdx = 1;
+    box1.boxAnt = box0;
     group.add(box1);
     boxes.push(box1);
     
@@ -360,6 +211,7 @@ function initSkinnedMesh() {
     box2.position.z = skeleton.bones[0].position.z;
     box2.art = skeleton.bones[2];
     box2.artIdx = 2;
+    box2.boxAnt = box1;
     group.add(box2);
     boxes.push(box2);
     
@@ -369,6 +221,7 @@ function initSkinnedMesh() {
     box3.position.z = skeleton.bones[0].position.z;
     box3.art = skeleton.bones[3];
     box3.artIdx = 3;
+    box3.boxAnt = box2;
     group.add(box3);
     boxes.push(box3);
     
@@ -378,8 +231,14 @@ function initSkinnedMesh() {
     box4.position.z = skeleton.bones[0].position.z;
     box4.art = skeleton.bones[4];
     box4.artIdx = 4;
+    box4.boxAnt = box3;
     group.add(box4);
     boxes.push(box4);
+
+    box0.boxSig = box1;
+    box1.boxSig = box2;
+    box2.boxSig = box3;
+    box3.boxSig = box4;
 }
 
 function createGeometry( sizing ) {
@@ -459,8 +318,6 @@ function getIntersections( controller ) {
 
 function intersectObjects( controller ) {
 
-    // Do not highlight when already selected
-
     if ( controller.userData.selected !== undefined ) return;
 
     const line = controller.getObjectByName( 'line' );
@@ -469,19 +326,14 @@ function intersectObjects( controller ) {
     if ( intersections.length > 0 ) {
 
             const intersection = intersections[ 0 ];
-
             const object = intersection.object;
             object.material.emissive.r = 1;
-            //intersected.push( object );
-
+            intersected.push( object );
             line.scale.z = intersection.distance;
 
     } else {
-
             line.scale.z = 100;
-
     }
-
 }
 
 function cleanIntersected() {
@@ -500,7 +352,7 @@ function animate() {
 }
 
 function render() {
-    //cleanIntersected();
+    cleanIntersected();
 
     intersectObjects( controller1 );
     intersectObjects( controller2 );
@@ -509,24 +361,39 @@ function render() {
 }
 
 function actualizarHuesoSeleccionada(caja) {
-    let relativa = damePosicionCaja(caja);
+    let relativa = damePosicionGlobal(caja);
 
-    console.log(relativa)
+    if (caja.boxAnt !== undefined) {
 
-    let x = 0, y = 0, z = 0;
+        let relativaAnt = damePosicionGlobal(caja.boxAnt)
 
-    for (let i = 0; i < caja.artIdx; i++) {
-        x += boxes[i].position.x;
-        y += boxes[i].position.y;
-        z += boxes[i].position.z;
+        caja.art.position.set(
+            relativa.x - relativaAnt.x,
+            relativa.y - relativaAnt.y,
+            relativa.z - relativaAnt.z
+        )
+
+    } else {
+        caja.art.position.set(
+            relativa.x,
+            relativa.y,
+            relativa.z
+        )
     }
+}
 
-    caja.art.position.setFromMatrixPosition( caja.matrixWorld );
+function actualizarRestoCajas(caja) {
 
-    /*Enviar mensaje a @Eduardo98M
-    
-    caja.art.position.x = relativa.x - caja.desfX + x;
-    caja.art.position.y = relativa.y - caja.desfX + y;
-    caja.art.position.z = relativa.z - caja.desfX + z;*/
+    let cajaActual = caja.boxSig;
 
+    while (cajaActual !== undefined) {
+        let relativa = damePosicionGlobal(cajaActual.art);
+
+        cajaActual.position.set(
+            relativa.x,
+            relativa.y,
+            relativa.z
+        )
+        cajaActual = cajaActual.boxSig;
+      }
 }
