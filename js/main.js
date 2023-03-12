@@ -17,7 +17,10 @@ const tempMatrix = new THREE.Matrix4();
 let group;
 
 let raycaster;
-         
+
+let valorAnterior;
+let contador;
+
 init();
 animate();
 
@@ -95,38 +98,41 @@ function init() {
 
 function onSelectStart( event ) {
 
+    contador = 0;
     const controller = event.target;
 
     const intersections = getIntersections( controller );
     if ( intersections.length > 0 ) {
 
-        boxes.forEach(box => {
+        /*boxes.forEach(box => {
             let posicion = damePosicionGlobal(box.art);
 
             box.ox = posicion.x;
             box.oy = posicion.y;
             box.oz = posicion.z;
-        });
+        });*/
 
         const intersection = intersections[ 0 ];
         const object = intersection.object;
         object.material.emissive.b = 1;
         controller.attach( object );
         controller.userData.selected = object;
+        valorAnterior = damePosicionGlobal(object.art)
 
-        boxes.forEach(box => {
+        /*boxes.forEach(box => {
             let posicion = damePosicionGlobal(object.art);
 
             box.ox -= posicion.x;
             box.oy -= posicion.y - 6*(object.artIdx - box.artIdx);
             box.oz -= posicion.z;
-        });
+        });*/
     }
 }
 
 function onSelectEnd( event ) {
 
     const controller = event.target;
+    contador = -1;
 
     if ( controller.userData.selected !== undefined ) {
 
@@ -352,14 +358,10 @@ function intersectObjects( controller ) {
 }
 
 function cleanIntersected() {
-
     while ( intersected.length ) {
-
-            const object = intersected.pop();
-            object.material.emissive.r = 0;
-
+        const object = intersected.pop();
+        object.material.emissive.r = 0;
     }
-
 }
 
 function animate() {
@@ -376,7 +378,6 @@ function render() {
 }
 
 function actualizarHuesoSeleccionada(caja) {
-
     let relativa = damePosicionGlobal(caja);
 
     if (caja.boxAnt !== undefined) {
@@ -396,6 +397,33 @@ function actualizarHuesoSeleccionada(caja) {
             relativa.z
         )
     }
+    
+
+    if (contador < 2) {
+        contador++;
+    } else {
+        contador = 0;
+
+        let posDespuesCambio = damePosicionGlobal(caja.art);
+        console.log(valorAnterior)
+        console.log(posDespuesCambio)
+
+        if (caja !== box4) {
+            let cajaActual = caja.boxSig;
+    
+            while (cajaActual !== undefined) {    
+    
+                cajaActual.art.position.x += posDespuesCambio.x - valorAnterior.x;
+                cajaActual.art.position.y += posDespuesCambio.y - valorAnterior.y;
+                cajaActual.art.position.z += posDespuesCambio.z - valorAnterior.z;
+    
+                cajaActual = cajaActual.boxSig;
+            }
+        }
+        valorAnterior = posDespuesCambio;
+    }
+
+    
 
     /*let posX=0, posY=0, posZ=0;
 
@@ -414,21 +442,21 @@ function actualizarHuesoSeleccionada(caja) {
         }
     }*/
 
-    if (caja !== box0) {
+    /*if (caja !== box4) {
         let cajaActual = caja.boxSig;
 
-        while (cajaActual !== undefined) {
+        while (cajaActual !== undefined) {*/
             
-            let posGlobal = damePosicionGlobal(caja.art)
+            /*let posGlobal = damePosicionGlobal(caja.art)
 
 
             cajaActual.art.position.x = cajaActual.ox + caja.art.position.x //- posX;
             cajaActual.art.position.y = cajaActual.oy + caja.art.position.y //- posY;
-            cajaActual.art.position.z = cajaActual.oz + caja.art.position.z //- posZ;
+            cajaActual.art.position.z = cajaActual.oz + caja.art.position.z //- posZ;*/
 
-            cajaActual = cajaActual.boxSig;
+         /*   cajaActual = cajaActual.boxSig;
         }
-    }
+    }*/
 
 }
 
