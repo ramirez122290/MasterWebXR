@@ -143,7 +143,7 @@ function onMove (event) {
 
 function initSkinnedMesh() {
 
-    const segmentHeight = 2;
+    const segmentHeight = 0.5;
     const segmentCount = 4;
     const height = segmentHeight * segmentCount;
     const halfHeight = height * 0.5;
