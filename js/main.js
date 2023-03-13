@@ -41,7 +41,7 @@ function init() {
     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
     camera.position.z = 60;
          
-    const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
+    const floorGeometry = new THREE.PlaneGeometry( 50, 50 );
     const floorMaterial = new THREE.MeshStandardMaterial( {
             color: 0xeeeeee,
             roughness: 1.0,
