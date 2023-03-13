@@ -181,7 +181,7 @@ function initSkinnedMesh() {
     scene.add( skeletonHelper );
 
 
-    const aBoxGeometry = new THREE.BoxGeometry( 2, 0.5, 2 );
+    const aBoxGeometry = new THREE.BoxGeometry( 0.5, 0.1, 0.5 );
 
     box0 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
          
@@ -244,8 +244,8 @@ function initSkinnedMesh() {
 function createGeometry( sizing ) {
 
     const geometry = new THREE.CylinderGeometry(
-            2, // radiusTop
-            2, // radiusBottom
+            0.3, // radiusTop
+            0.3, // radiusBottom
             sizing.height, // height
             8, // radiusSegments
             sizing.segmentCount * 1, // heightSegments
