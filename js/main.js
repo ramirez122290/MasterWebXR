@@ -143,7 +143,7 @@ function onMove (event) {
 
 function initSkinnedMesh() {
 
-    const segmentHeight = 6;
+    const segmentHeight = 2;
     const segmentCount = 4;
     const height = segmentHeight * segmentCount;
     const halfHeight = height * 0.5;
@@ -185,7 +185,7 @@ function initSkinnedMesh() {
 
     box0 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
          
-    skeleton.bones[0].position.z = -30;
+    skeleton.bones[0].position.z = -5;
          
     box0.position.x = skeleton.bones[0].position.x;
     box0.position.y = skeleton.bones[0].position.y;
