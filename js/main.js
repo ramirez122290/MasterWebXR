@@ -181,7 +181,7 @@ function initSkinnedMesh() {
     scene.add( skeletonHelper );
 
 
-    const aBoxGeometry = new THREE.BoxGeometry( 10, 2, 10 );
+    const aBoxGeometry = new THREE.BoxGeometry( 2, 0.5, 2 );
 
     box0 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
          
