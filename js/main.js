@@ -186,7 +186,7 @@ function initSkinnedMesh() {
     box0 = new THREE.Mesh( aBoxGeometry, new THREE.MeshStandardMaterial( { color: 0x00ff00 } ) );
          
     skeleton.bones[0].position.z = -1;
-    skeleton.bones[0].position.y = 4;
+    skeleton.bones[0].position.y = 1;
          
     box0.position.x = skeleton.bones[0].position.x;
     box0.position.y = skeleton.bones[0].position.y;
