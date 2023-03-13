@@ -38,7 +38,7 @@ function init() {
     let hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.3 );
     scene.add( hemiLight );
     
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
     camera.position.z = 60;
          
     const floorGeometry = new THREE.PlaneGeometry( 50, 50 );
